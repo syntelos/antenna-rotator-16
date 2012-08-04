@@ -1,6 +1,100 @@
-resolution = 20;
+resolution = 10;
 
 module vertical_bearing(){
+	/*
+	 * 
+	 */
+	module motor_mount_add(){
+		/*
+		 * Motor enclosure wall, 2mm
+		 */	
+		translate([0,-130,160]){
+			rotate([90,0,0]){
+				cylinder(r = 32, h = 100, center = true, $fn = resolution);
+			}
+		}
+		translate([0,-130,130]){
+			rotate([90,0,0]){
+				cube(size = [26,14,100], center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * Motor cable guide, +82.5mm from mounting plane, 6.6mm ID, 8.6mm OD
+		 * Mounting plane (80mm) + Offset Delta (82.5) = 162.5
+		 */
+		translate([0,-162.5,113]){
+
+			cylinder(r = 4.3, h = 20, center = true, $fn = resolution);
+		}
+		translate([0,-162.5,122]){
+
+			cylinder(r = 10, h = 2, center = true, $fn = resolution); //fillet
+		}
+	}
+	/*
+	 * 
+	 */
+	module motor_mount_subtract(){
+		/*
+		 * Cutout motor mount interior walls, 2mm
+		 */
+		translate([0,-145,160]){
+			rotate([90,0,0]){
+				/*
+				 * 60mm motor space diameter
+				 */
+				cylinder(r = 30, h = 130, center = true, $fn = resolution);
+			}
+		}
+		translate([0,-131,130]){
+			rotate([90,0,0]){
+				cube(size = [22,10,102], center = true, $fn = resolution);
+			}
+		}
+		translate([0,-162.5,123]){
+
+			cylinder(r = 3.3, h = 44, center = true, $fn = resolution);
+			cylinder(r = 6, h = 1, center = true, $fn = resolution); // fillet
+		}
+		/*
+		 * Cutout motor mount clearance
+		 */
+		translate([0,-75,160]){
+			rotate([90,0,0]){
+				/*
+				 * 24mm entry way
+				 */
+				cylinder(r = 12, h = 10, center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * Cutout motor mount M4 fastener tunnels
+		 */
+		translate([0,-75,143]){
+			// bottom
+			rotate([90,0,0]){
+				cylinder(r = 2, h = 12, center = true, $fn = resolution);
+			}
+		}
+		translate([0,-75,177]){
+			// top
+			rotate([90,0,0]){
+				cylinder(r = 2, h = 12, center = true, $fn = resolution);
+			}
+		}
+		translate([-17,-75,160]){
+			// left
+			rotate([90,0,0]){
+				cylinder(r = 2, h = 12, center = true, $fn = resolution);
+			}
+		}
+		translate([+17,-75,160]){
+			// right
+			rotate([90,0,0]){
+				cylinder(r = 2, h = 12, center = true, $fn = resolution);
+			}
+		}
+	}
 	difference(){
 		union(){
 			/*
@@ -19,6 +113,14 @@ module vertical_bearing(){
 				}
 			}
 			/*
+			 * Vertical rotator weather strip, 1mm wall
+			 */	
+			translate([0,80,160]){
+				rotate([90,0,0]){
+					cylinder(r = 142, h = 20, center = true, $fn = resolution);
+				}
+			}
+			/*
 			 * Vertical support column and crown 
 			 * for mating to horizontal rotator.
 			 */
@@ -34,6 +136,7 @@ module vertical_bearing(){
 			translate([0,0,-80]){
 				cylinder(r = 120, h = 20, center = true, $fn = resolution);
 			}
+			motor_mount_add();
 		}
 		/*
 		 * Cutout vertical rotator, 
@@ -106,55 +209,7 @@ module vertical_bearing(){
 				}
 			}
 		}
-		/*
-		 * Cutout motor mount interior wall
-		 */
-		translate([0,-95,160]){
-			rotate([90,0,0]){
-				/*
-				 * 60mm motor space diameter
-				 */
-				cylinder(r = 30, h = 30, center = true, $fn = resolution);
-			}
-		}
-		/*
-		 * Cutout motor mount clearance
-		 */
-		translate([0,-75,160]){
-			rotate([90,0,0]){
-				/*
-				 * 24mm entry way
-				 */
-				cylinder(r = 12, h = 10, center = true, $fn = resolution);
-			}
-		}
-		/*
-		 * Cutout motor mount M4 fastener tunnels
-		 */
-		translate([0,-75,143]){
-			// bottom
-			rotate([90,0,0]){
-				cylinder(r = 2, h = 12, center = true, $fn = resolution);
-			}
-		}
-		translate([0,-75,177]){
-			// top
-			rotate([90,0,0]){
-				cylinder(r = 2, h = 12, center = true, $fn = resolution);
-			}
-		}
-		translate([-17,-75,160]){
-			// left
-			rotate([90,0,0]){
-				cylinder(r = 2, h = 12, center = true, $fn = resolution);
-			}
-		}
-		translate([+17,-75,160]){
-			// right
-			rotate([90,0,0]){
-				cylinder(r = 2, h = 12, center = true, $fn = resolution);
-			}
-		}
+		motor_mount_subtract();
 	}
 }
 
