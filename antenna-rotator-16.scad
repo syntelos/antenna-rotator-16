@@ -1,4 +1,4 @@
-resolution = 10;
+resolution = 20;
 
 module vertical_bearing(){
 	/*
@@ -38,17 +38,33 @@ module vertical_bearing(){
 		/*
 		 * Cutout motor mount interior walls, 2mm
 		 */
-		translate([0,-145,160]){
+		translate([0,-125,160]){
 			rotate([90,0,0]){
 				/*
-				 * 60mm motor space diameter
+				 * 60mm motor space diameter with 5mm end plate shoulder
 				 */
-				cylinder(r = 30, h = 130, center = true, $fn = resolution);
+				cylinder(r = 30, h = 90, center = true, $fn = resolution);
 			}
 		}
-		translate([0,-131,130]){
+		translate([0,-131,160]){
 			rotate([90,0,0]){
-				cube(size = [22,10,102], center = true, $fn = resolution);
+				/*
+				 * remove interior of end plate shoulder
+				 */
+				cylinder(r = 25, h = 100.5, center = true, $fn = resolution);
+			}
+		}
+		translate([0,-179,160]){
+			rotate([90,0,0]){
+				/*
+				 * remove exterior of end plate shoulder
+				 */
+				cylinder(r = 30, h = 2.1, center = true, $fn = resolution);
+			}
+		}
+		translate([0,-135,135]){
+			rotate([90,0,0]){
+				cube(size = [22,20,80], center = true, $fn = resolution);
 			}
 		}
 		translate([0,-162.5,123]){
@@ -64,7 +80,7 @@ module vertical_bearing(){
 				/*
 				 * 24mm entry way
 				 */
-				cylinder(r = 12, h = 10, center = true, $fn = resolution);
+				cylinder(r = 12, h = 20, center = true, $fn = resolution);
 			}
 		}
 		/*
@@ -92,6 +108,20 @@ module vertical_bearing(){
 			// right
 			rotate([90,0,0]){
 				cylinder(r = 2, h = 12, center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * M3 motor cover soft receivers 
+		 * (screw into plastic with light torque)
+		 * Shoulder depth 5mm
+		 * Receiver ID 2.7mm
+		 */
+		translate([0,-175,160]){
+			rotate([90,0,0]){
+				for ( i = [30 : 60 : 360] ){
+				    translate([sin(i)*27.5, cos(i)*27.5, 0])
+				    cylinder(r = 1.35, h = 11, center = true, $fn = resolution);
+				}
 			}
 		}
 	}
