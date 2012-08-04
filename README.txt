@@ -4,10 +4,7 @@ OpenSCAD project for 16 kg-m antenna rotator
 Antenna http://www.arrowantennas.com/arrowii/146-437.html
   Mount 3/4" (19.05mm) rounded square tube (aluminum), depth 4" (101.6mm)
 
-Motors (2) http://www.aliexpress.com/product-fm/469620309-42mm-Micro-Planetary-Speed-Reducer-GP42-Z-planetary-gearbox-wholesalers.html
-  Mount square 31mm M4
-  Outer clearance square 43mm
-  Length from mounting 48mm
+Motors (2) http://www.aliexpress.com/store/product/explosion-proof-DC-servo-Brushless-gear-motor-micro-planetary-gearbox-gear-reducer-156kg-cm-hight-torque/506137_516569606.html
 
 External mounting 4" PVC Pipe, depth 4" (101.6mm)
 
