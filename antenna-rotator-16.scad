@@ -1,5 +1,161 @@
-resolution = 20;
+/*
+ * Antenna Rotator 16 kg-m
+ * Copyright 2012 John Pritchard
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+resolution = 100;
 
+/*
+ * Cantilever housing and antenna support, basic outline
+ */
+module vertical_rotator_geometry(c = 0.0){
+	union(){
+		/*
+		 * Vertical rotator with 10mm motor mount wall 
+		 */
+		translate([0,15,160]){
+			rotate([90,0,0]){
+				cylinder(r = 140+c, h = 170+c, center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * Weather shoulder, 2mm high
+		 */
+		translate([0,100,160]){
+			rotate([90,0,0]){
+				cylinder(r = 138+c, h = 80+c, center = true, $fn = resolution);
+			}
+		}
+		translate([0,110,160]){
+			rotate([90,0,0]){
+				cylinder(r = 140+c, h = 10+c, center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * Cutout vertical bearing races
+		 */
+		translate([0,0,160]){
+			rotate([90,0,0]){
+				/*
+				 * Roller bearing race way: 30mm roller space height
+				 */
+				cylinder(r = 220+c, h = 60+c, center = true, $fn = resolution);
+				/*
+				 * Ball bearing races (2): 15mm ball space height
+				 */
+				cylinder(r = 190+c, h = 120+c, center = true, $fn = resolution);
+			}
+		}
+	}
+}
+/*
+ * Cantilever housing and antenna support, positive
+ */
+module vertical_rotator(){
+	/*
+	 * 
+	 */
+	module vertical_rotator_subtract1(){
+	
+		translate([0,0,160]){
+			rotate([90,0,0]){
+				/*
+				 * Primary internal body cavity
+				 */
+				cylinder(r = 150, h = 40, center = true, $fn = resolution);
+	
+				cylinder(r = 100, h = 80, center = true, $fn = resolution);
+			}
+		}
+	}
+	/*
+	 * 
+	 */
+	module vertical_rotator_subtract2(){
+	
+		translate([0,0,160]){
+			rotate([90,0,0]){
+				/*
+				 * Reinforced cavities
+				 */
+				for ( i = [30 : 60 : 360] ){
+				    translate([sin(i)*80, cos(i)*80, 0])
+				    cylinder(r = 30, h = 400, center = true, $fn = resolution);
+				}
+				/*
+				 * Preliminary speculative motor shaft attachment
+				 * 
+				 * The requirement is for a through- hole into the 
+				 * center of this body
+				 * 
+				 * Shaft diameter 12mm, radius 6mm, cut to square of size 8.4mm
+				 */
+				cube(size = [8.4,8.4,400], center = true);
+			}
+		}
+		translate([0,-20,160]){
+			/*
+			 * Escape from body center into motor shaft
+			 */
+			cylinder(r = 4, h = 100, center = true, $fn = resolution);
+		}
+		translate([0,+40,160]){
+			/*
+			 * Escape from body center into motor shaft
+			 */
+			cylinder(r = 4, h = 100, center = true, $fn = resolution);
+		}
+	}
+	/*
+	 * 
+	 */
+	module vertical_rotator_add(){
+	
+		translate([0,0,160]){
+			rotate([90,0,0]){
+				/*
+				 * Reinforce horizontal cutouts
+				 */
+				for ( i = [30 : 60 : 360] ){
+				    translate([sin(i)*80, cos(i)*80, 0])
+				    cylinder(r = 40, h = 130, center = true, $fn = resolution);
+				}
+				/*
+				 * Reinforce motor shaft centerline
+				 */
+				cylinder(r = 40, h = 130, center = true, $fn = resolution);
+			}
+		}
+	}
+	/*
+	 * 
+	 */
+	difference(){	
+		union(){
+			difference(){
+				vertical_rotator_geometry(-0.5);
+				vertical_rotator_subtract1();
+			}		
+			vertical_rotator_add();
+		}
+		vertical_rotator_subtract2();
+	}
+}
+/*
+ * Bearing for vertical rotator and mating to horizontal rotator
+ */
 module vertical_bearing(){
 	/*
 	 * 
@@ -29,6 +185,14 @@ module vertical_bearing(){
 		translate([0,-162.5,122]){
 
 			cylinder(r = 10, h = 2, center = true, $fn = resolution); //fillet
+		}
+		/*
+		 * Motor cover (independent)
+		 */
+		translate([0,-200,160]){
+			rotate([90,0,0]){
+				cylinder(r = 30, h = 2, center = true, $fn = resolution);
+			}
 		}
 	}
 	/*
@@ -115,16 +279,82 @@ module vertical_bearing(){
 		 * (screw into plastic with light torque)
 		 * Shoulder depth 5mm
 		 * Receiver ID 2.7mm
+		 * (drill both cover and shoulder)
 		 */
-		translate([0,-175,160]){
+		translate([0,-190,160]){
 			rotate([90,0,0]){
 				for ( i = [30 : 60 : 360] ){
 				    translate([sin(i)*27.5, cos(i)*27.5, 0])
-				    cylinder(r = 1.35, h = 11, center = true, $fn = resolution);
+				    cylinder(r = 1.35, h = 40, center = true, $fn = resolution);
 				}
 			}
 		}
 	}
+	/*
+	 * 
+	 */
+	module escapes_subtract(){
+		/*
+		 * roller bearing thrust surface
+		 */
+		translate([0,0,0]){
+			cylinder(r = 4, h = 200, center = true, $fn = resolution);
+		}
+		/*
+		 * ball bearing cage rail
+		 */
+		translate([0,-45,0]){
+			cylinder(r = 4, h = 200, center = true, $fn = resolution);
+		}
+		/*
+		 * ball bearing cage rail
+		 */
+		translate([0,+45,0]){
+			cylinder(r = 4, h = 200, center = true, $fn = resolution);
+		}
+		/*
+		 * rotator weather trim
+		 */
+		translate([0,80,0]){
+			cylinder(r = 4, h = 200, center = true, $fn = resolution);
+		}
+	}
+	/*
+	 * 
+	 */
+	module bearing_cage_rails_subtract(c = +0.05){
+		/*
+		 * Vertical ball bearing cage rail: 2mm width, 3mm depth
+		 */
+		translate([0,-45,160]){
+			rotate([90,0,0]){
+				cylinder(r = 196+c, h = 2+c, center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * Vertical ball bearing cage rail: 2mm width, 3mm depth
+		 */
+		translate([0,+45,160]){
+			rotate([90,0,0]){
+				cylinder(r = 196+c, h = 2+c, center = true, $fn = resolution);
+			}
+		}
+		/*
+		 * Roller bearing cage rail: 2mm width, 3mm depth
+		 */
+		translate([0,0,160]){
+			rotate([90,0,0]){
+				rotate_extrude($fn = resolution){
+					translate([205, 0, 0]){
+						polygon(points = [[-1+c,-33+c],[-1+c,33+c],[1+c,33+c],[-1+c,33+c]]);
+					}
+				}
+			}
+		}
+	}
+	/*
+	 * 
+	 */
 	difference(){
 		union(){
 			/*
@@ -147,7 +377,7 @@ module vertical_bearing(){
 			 */	
 			translate([0,80,160]){
 				rotate([90,0,0]){
-					cylinder(r = 142, h = 20, center = true, $fn = resolution);
+					cylinder(r = 142, h = 68, center = true, $fn = resolution);
 				}
 			}
 			/*
@@ -168,79 +398,18 @@ module vertical_bearing(){
 			}
 			motor_mount_add();
 		}
-		/*
-		 * Cutout vertical rotator, 
-		 * leaving a 10mm motor mount wall 
-		 * in the vertical bearing hull
-		 */
-		translate([0,50,160]){
-			rotate([90,0,0]){
-				cylinder(r = 140, h = 240, center = true, $fn = resolution);
-			}
-		}
-		/*
-		 * Cutout vertical bearing races
-		 */
-		translate([0,0,160]){
-			rotate([90,0,0]){
-				/*
-				 * Roller bearing race way: 30mm roller space height
-				 */
-				cylinder(r = 220, h = 60, center = true, $fn = resolution);
-				/*
-				 * Ball bearing races (2): 15mm ball space height
-				 */
-				cylinder(r = 190, h = 120, center = true, $fn = resolution);
-			}
-		}
-		/*
-		 * Cutout 8mm escape tunnel into the roller bearing thrust surface
-		 */
-		translate([0,0,0]){
-			cylinder(r = 4, h = 200, center = true, $fn = resolution);
-		}
-		/*
-		 * Cutout 8mm escape tunnel into the ball bearing cage rail
-		 */
-		translate([0,-45,0]){
-			cylinder(r = 4, h = 200, center = true, $fn = resolution);
-		}
-		/*
-		 * Cutout vertical ball bearing cage rail: 2mm width, 3mm depth
-		 */
-		translate([0,-45,160]){
-			rotate([90,0,0]){
-				cylinder(r = 196, h = 2, center = true, $fn = resolution);
-			}
-		}
-		/*
-		 * Cutout 8mm escape tunnel into the ball bearing cage rail
-		 */
-		translate([0,+45,0]){
-			cylinder(r = 4, h = 200, center = true, $fn = resolution);
-		}
-		/*
-		 * Cutout vertical ball bearing cage rail: 2mm width, 3mm depth
-		 */
-		translate([0,+45,160]){
-			rotate([90,0,0]){
-				cylinder(r = 196, h = 2, center = true, $fn = resolution);
-			}
-		}
-		/*
-		 * Cutout roller bearing cage rail: 2mm width, 3mm depth
-		 */
-		translate([0,0,160]){
-			rotate([90,0,0]){
-				rotate_extrude($fn = resolution){
-					translate([205, 0, 0]){
-						polygon(points = [[-1,-33],[-1,33],[1,33],[-1,33]]);
-					}
-				}
-			}
-		}
+		vertical_rotator_geometry(+0.5);
+		bearing_cage_rails_subtract()
+		escapes_subtract();
 		motor_mount_subtract();
 	}
 }
 
+
+
+
+vertical_rotator();
+
 vertical_bearing();
+
+
