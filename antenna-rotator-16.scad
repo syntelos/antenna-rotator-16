@@ -29,6 +29,11 @@ resolution = 40;
  * applied to diameter of cylinder, side of cube
  */
 mechtol = 0.005;
+/*
+ * employ "include", not "use", so the resolution and 
+ * tolerance constants are shared
+ */
+include <gearmotor.scad>;
 
 head_bearing_height = 0.5625;
 
@@ -64,8 +69,35 @@ module head_block(){
 	cylinder(r = (2.625-mechtol)/2, h = head_block_height, center = true, $fn = resolution);
 }
 module head_block_mount(){
-
-	head_block();
+	difference(){
+		head_block();
+		gearmotor_mount(head_block_height);
+		translate([0,0,-(head_block_height/2)+0.05]){
+			gearmotor_body(gearmotor_body_radius+0.1, 0.1);
+		}
+		translate([0,0,+(head_block_height/2)-0.125]){
+			/*
+			 * Embedded axle clearance
+			 */
+			cylinder(r = (1.5+(2*mechtol))/2, h = 0.25, center = true, $fn = resolution);
+			/*
+			 * Mount bolt head clearance 
+			 * M4 ALLEN DIN 912
+			 * Head Height 4 mm, 0.1575 in; Diameter 7 mm, 0.2756 in
+			 *
+			 * Flat Washer
+			 * Diameter 9mm, 0.3543 in; Height = 0.8 mm, 0.0315 in
+			 */
+			gearmotor_mount_holes(depth = 0.25, expansion = 0.1771);
+		}
+		translate([0,0,+(head_block_height/2)-0.25-(0.189/2)]){
+			/*
+			 * Mount bolt head sink 
+			 * M4 ALLEN DIN 912 Head + Flat Washer (4 + 0.8 mm)
+			 */
+			gearmotor_mount_holes(depth = 0.189, expansion = 0.1771);
+		}
+	}
 }
 module head_block_shaft(){
 
@@ -107,64 +139,9 @@ module head_bearing_spacer(){
 		cylinder(r = (2.25/2), h = head_bearing_spacer_height, center = true, $fn = resolution);
 	}
 }
-
-gearmotor_mount_height = 3.819;
-
 /*
- * Brushless motor with planetary gearhead, 
- * drive control, position encoder, brake:
- * 24V, 2A, 500:1, 15.6 kg-m, 8 rpm;
- * http://www.aliexpress.com/store/product/explosion-proof-DC-servo-Brushless-gear-motor-micro-planetary-gearbox-gear-reducer-156kg-cm-hight-torque/506137_516569606.html
+ *
  */
-module gearmotor(){
-	difference(){
-		union(){
-			/*
-			 * Main body volume
-			 */
-			cylinder(r = 0.8366, h = gearmotor_mount_height, center = true, $fn = resolution);
-			/*
-			 * Mount plane from center
-			 */
-			translate([0,0,1.9095]){
-				/*
-				 * Mount shoulder
-				 * Translated for half of height, centered
-				 */
-				translate([0,0,0.053]){
-					cylinder(r = 0.4724, h = 0.106, center = true, $fn = resolution);
-				}
-				/*
-				 * Output shaft
-				 * Translated for half of height, centered
-				 */
-				translate([0,0,0.3935]){
-					cylinder(r = 0.2362, h = 0.787, center = true, $fn = resolution);
-				}
-			}
-			/*
-			 * Electrical connector, a space filling model
-			 * for the bounds [20,2.75,6] mm
-			 */
-			translate([0,-0.8366,-1.339]){
-				cube(size = [0.7874,0.2166,0.2362], center = true);
-			}
-		}
-		/*
-		 * M4 mounting holes
-		 */
-		for (theta = [0 : 90: 300] ){
-			/*
-			 * translate to the mount plane and hole center
-			 * for a representative negative space centered 
-			 * on this point.
-			 */
-			translate([0.6693*sin(theta),0.6693*cos(theta),1.9095]){
-				cylinder(r = 0.0787, h = 0.5, center = true, $fn = resolution);
-			}
-		}
-	}
-}
 module head(){
 	rotate([0,90,0]){
 		% head_tube();
@@ -181,9 +158,12 @@ module head(){
 			head_bearing();
 		}
 		translate([0,0,+((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height/2)+(2*mechtol))]){
-			head_block_mount();
+			head_block_shaft();
 		}
    }
 }
 
-head();
+//gearmotor();
+//head();
+head_block_mount();
+
