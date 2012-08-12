@@ -1,16 +1,17 @@
 
 OpenSCAD project for 16 kg-m antenna rotator in aluminum for machine tools
 
-Antenna http://www.arrowantennas.com/arrowii/146-437.html
+Antenna: Arrow Satellite Yagi
+  Source http://www.arrowantennas.com/arrowii/146-437.html
   Mount 3/4" (19.05mm) rounded square tube (aluminum), depth 4" (101.6mm)
 
-Motors (2) http://www.aliexpress.com/store/product/explosion-proof-DC-servo-Brushless-gear-motor-micro-planetary-gearbox-gear-reducer-156kg-cm-hight-torque/506137_516569606.html
+Motors: (2) http://www.aliexpress.com/store/product/explosion-proof-DC-servo-Brushless-gear-motor-micro-planetary-gearbox-gear-reducer-156kg-cm-hight-torque/506137_516569606.html
 
-External mounting 4" PVC Pipe, depth 4" (101.6mm)
+Mounting mast: 1 1/2 inch "rigid conduit"
 
-Counter balance shaft (as antenna) 2 feet of 3/4 X 3/4 X 0.12" rounded square steel tube http://www.metalsdepot.com/products/hrsteel2.phtml?page=sqtube&LimAcc=$LimAcc
+Counter balance shaft: (as antenna) 2 feet of 3/4 X 3/4 X 0.12" rounded square steel tube http://www.metalsdepot.com/products/hrsteel2.phtml?page=sqtube&LimAcc=$LimAcc
 
-Motor cable, 4 pair shielded AWG-24; 
+Motor cable: 4 pair shielded AWG-24; 
   Belden 1533R
   Datasheet http://www.belden.com/techdatas/english/1533R.pdf
   Source http://www.fullcompass.com/product/402600.html
