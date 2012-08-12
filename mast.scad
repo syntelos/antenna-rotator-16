@@ -16,16 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * units = inches
+ */
+
+
+mast_bearing_height = 0.42;
 
 /*
- * employ "include", not "use", so the resolution and 
- * tolerance constants are shared
+ * LM67048 Tapered Bearing and L44610 Cup: 1.25 ID, 1.98 OD
  */
-include <constants.scad>;
-include <gearmotor.scad>;
-include <head.scad>;
-include <mast.scad>;
+module mast_bearing(){
+	difference(){
+		cylinder(r = 0.990, h = mast_bearing_height, center = true, $fn = resolution);
+		cylinder(r = 0.625, h = mast_bearing_height, center = true, $fn = resolution);
+	}
+}
 
+mast_block_height = 0.75;
 
-head_block_mount();
-
+/*
+ * Turn 2" Round 6061 to (2.0-mechtol) OD
+ */
+module mast_block(){
+	/*
+	 * TODO 
+	 */
+	cylinder(r = (2.0-mechtol)/2, h = mast_block_height, center = true, $fn = resolution);
+}

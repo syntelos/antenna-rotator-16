@@ -16,16 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * units = inches
+ */
 
 /*
- * employ "include", not "use", so the resolution and 
- * tolerance constants are shared
+ * model resolution: 10 is low, 100 is high
  */
-include <constants.scad>;
-include <gearmotor.scad>;
-include <head.scad>;
-include <mast.scad>;
-
-
-head_block_mount();
-
+resolution = 40;
+/*
+ * mechanical tolerance, separation of fit:
+ * applied to diameter of cylinder, side of cube
+ */
+mechtol = 0.005;
