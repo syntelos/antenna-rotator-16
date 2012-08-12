@@ -1,8 +1,5 @@
 
-OpenSCAD project for 16 kg-m antenna rotator
-
-    Current 3D Printing technology is unable to produce such a design at a reasonable cost
-
+OpenSCAD project for 16 kg-m antenna rotator in aluminum for machine tools
 
 Antenna http://www.arrowantennas.com/arrowii/146-437.html
   Mount 3/4" (19.05mm) rounded square tube (aluminum), depth 4" (101.6mm)

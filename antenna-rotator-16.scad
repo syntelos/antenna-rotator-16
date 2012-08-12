@@ -15,68 +15,176 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-resolution = 10;
-
 
 /*
- * Bearing for vertical rotator and mating to horizontal rotator
+ * units = inches
  */
 
+/*
+ * model resolution: 10 is low, 100 is high
+ */
+resolution = 40;
+/*
+ * mechanical tolerance, separation of fit:
+ * applied to diameter of cylinder, side of cube
+ */
+mechtol = 0.005;
 
-module toroid_constructor(wall = 0.0){
-    translate([0,0,160]){
-        hull(){
-            rotate([90,0,0]){
-                rotate_extrude($fn = resolution){
-                    translate([160, 0, 0]){
-                        circle(r = (80+wall), $fn = resolution);
-                    }
-                }
-               cylinder(r = 160, h = (80+wall), center = true, $fn = resolution);
-            }
-        }
-    }
-}
-module toroid_escapes(){
-    translate([0,0,160]){
-        rotate([90,0,0]){
-            for ( i = [30 : 60 : 360] ){
-                translate([sin(i)*80, cos(i)*80, 0])
-                cylinder(r = 30, h = 161, center = true, $fn = resolution);
-            }
-        }
-    }
-}
-module toroid(){
-    difference(){
-        toroid_constructor(+2.5);
-        toroid_constructor(-2.5);
-        toroid_escapes();
-    }
-}
-module column_constructor(wall = 0.0){
+head_bearing_height = 0.5625;
 
-    translate([0,0,310]){
-        sphere(r = (90+wall), $fn = resolution);
-    }
-    translate([0,0,120]){
-        cylinder(r1 = (120+wall), r2 = (90+wall), h = 380, center = true, $fn = resolution);
-    }
-}
-module column(){
-    difference(){
-        column_constructor(+2.5);
-        column_constructor(-2.5);
-    }
+/*
+ * R24-2RS Radial Bearing: 1.5 ID, 2.625 OD, 0.5625 H
+ */
+module head_bearing(){
+	difference(){
+		cylinder(r = (2.625/2), h = head_bearing_height, center = true, $fn = resolution);
+		cylinder(r = (1.5/2), h = head_bearing_height, center = true, $fn = resolution);
+	}
 }
 
-module vertical_bearing(){
-    union(){
-        toroid();
-        column();
-    }
+mast_bearing_height = 0.42;
+
+/*
+ * LM67048 Tapered Bearing and L44610 Cup: 1.25 ID, 1.98 OD
+ */
+module mast_bearing(){
+	difference(){
+		cylinder(r = 0.990, h = mast_bearing_height, center = true, $fn = resolution);
+		cylinder(r = 0.625, h = mast_bearing_height, center = true, $fn = resolution);
+	}
 }
 
-//vertical_bearing();
+head_block_height = 0.75;
 
-toroid();
+/*
+ * Turn 3" Round 6061 to (2.625-mechtol) OD
+ */
+module head_block(){
+
+	cylinder(r = (2.625-mechtol)/2, h = head_block_height, center = true, $fn = resolution);
+}
+module head_block_mount(){
+
+	head_block();
+}
+module head_block_shaft(){
+
+	difference(){
+		head_block();
+		cylinder(r = (1.5+mechtol)/2, h = head_block_height, center = true, $fn = resolution);
+	}
+}
+
+mast_block_height = 0.75;
+
+/*
+ * Turn 2" Round 6061 to (2.0-mechtol) OD
+ */
+module mast_block(){
+	/*
+	 * TODO 
+	 */
+	cylinder(r = (2.0-mechtol)/2, h = mast_block_height, center = true, $fn = resolution);
+}
+/*
+ * Tube 6061 3.0 OD, 2.625 ID
+ */
+module head_tube(){
+	difference(){
+		cylinder(r = (3.0/2), h = 8.0, center = true, $fn = resolution);
+		cylinder(r = (2.625/2), h = 8.0, center = true, $fn = resolution);
+	}
+}
+
+head_bearing_spacer_height = 1.5;
+
+/*
+ * Tube 6061 2.75 OD, 0.25 Wall turned to (2.625-mechtol) OD
+ */
+module head_bearing_spacer(){
+	difference(){
+		cylinder(r = (2.625-mechtol)/2, h = head_bearing_spacer_height, center = true, $fn = resolution);
+		cylinder(r = (2.25/2), h = head_bearing_spacer_height, center = true, $fn = resolution);
+	}
+}
+
+gearmotor_mount_height = 3.819;
+
+/*
+ * Brushless motor with planetary gearhead, 
+ * drive control, position encoder, brake:
+ * 24V, 2A, 500:1, 15.6 kg-m, 8 rpm;
+ * http://www.aliexpress.com/store/product/explosion-proof-DC-servo-Brushless-gear-motor-micro-planetary-gearbox-gear-reducer-156kg-cm-hight-torque/506137_516569606.html
+ */
+module gearmotor(){
+	difference(){
+		union(){
+			/*
+			 * Main body volume
+			 */
+			cylinder(r = 0.8366, h = gearmotor_mount_height, center = true, $fn = resolution);
+			/*
+			 * Mount plane from center
+			 */
+			translate([0,0,1.9095]){
+				/*
+				 * Mount shoulder
+				 * Translated for half of height, centered
+				 */
+				translate([0,0,0.053]){
+					cylinder(r = 0.4724, h = 0.106, center = true, $fn = resolution
+	);
+				}
+				/*
+				 * Output shaft
+				 * Translated for half of height, centered
+				 */
+				translate([0,0,0.3935]){
+					cylinder(r = 0.2362, h = 0.787, center = true, $fn = resolution);
+				}
+			}
+			/*
+			 * Electrical connector, a space filling model
+			 * for the bounds [20,2.75,6] mm
+			 */
+			translate([0,-0.8366,-1.339]){
+				cube(size = [0.7874,0.2166,0.2362], center = true);
+			}
+		}
+		/*
+		 * M4 mounting holes
+		 */
+		for (theta = [0 : 90: 300] ){
+			/*
+			 * translate to the mount plane and hole center
+			 * for a representative negative space centered 
+			 * on this point.
+			 */
+			translate([0.6693*sin(theta),0.6693*cos(theta),1.9095]){
+				cylinder(r = 0.0787, h = 0.5, center = true, $fn = resolution);
+			}
+		}
+	}
+}
+module head(){
+	rotate([0,90,0]){
+		% head_tube();
+		translate([0,0,-((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height/2)+(2*mechtol))]){
+			head_block_mount();
+		}
+		translate([0,0,-((head_bearing_spacer_height/2)+(head_bearing_height/2)+mechtol)]){
+			head_bearing();
+		}
+		translate([0,0,0]){
+			head_bearing_spacer();
+		}
+		translate([0,0,+((head_bearing_spacer_height/2)+(head_bearing_height/2)+mechtol)]){
+			head_bearing();
+		}
+		translate([0,0,+((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height/2)+(2*mechtol))]){
+			head_block_mount();
+		}
+   }
+}
+
+head();
