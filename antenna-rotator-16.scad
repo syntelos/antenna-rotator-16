@@ -132,8 +132,7 @@ module gearmotor(){
 				 * Translated for half of height, centered
 				 */
 				translate([0,0,0.053]){
-					cylinder(r = 0.4724, h = 0.106, center = true, $fn = resolution
-	);
+					cylinder(r = 0.4724, h = 0.106, center = true, $fn = resolution);
 				}
 				/*
 				 * Output shaft
