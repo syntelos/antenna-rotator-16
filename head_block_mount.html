@@ -1,20 +1,22 @@
 <html>
-<head>
- <script src="/javascripts/Three.js"></script>
- <script src="/javascripts/plane.js"></script>
- <script src="/javascripts/thingiview.js"></script>
-    <script>
-      window.onload = function() {
-        thingiurlbase = "/syntelos/antenna-rotator-16/raw/master/HTML";
-        thingiview = new Thingiview("viewer");
-        thingiview.setObjectColor('#C0D8F0');
-        thingiview.setBackgroundColor('#90A0A0');
-        thingiview.setCameraView('top');
-        thingiview.initScene();
-        thingiview.loadSTL("/syntelos/antenna-rotator-16/raw/master/head_block_mount.stl");
-      }
-    </script>
-</head>
-<body bgcolor="#000">
-  <div id="viewer" style="width:700px;height:700px"></div>
+ <head>
+  <meta http-equiv="content-type" content="text/html" />
+  <script src="HTML/Three.js"><!--  --></script>
+  <script src="HTML/plane.js">><!--  --></script>
+  <script src="HTML/thingiview.js">><!--  --></script>
+  <script>
+       window.onload = function() {
+         thingiurlbase = "/syntelos/antenna-rotator-16/master/HTML";
+         thingiview = new Thingiview("viewer");
+         thingiview.setObjectColor('#C0D8F0');
+         thingiview.setBackgroundColor('#90A0A0');
+         thingiview.setCameraView('top');
+         thingiview.initScene();
+         thingiview.loadSTL("/syntelos/antenna-rotator-16/master/head_block_mount.stl");
+       }
+  </script>
+ </head>
+ <body bgcolor="#000">
+   <div id="viewer" style="width:700px;height:700px"></div>
+ </body>
 </html>
