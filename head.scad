@@ -23,6 +23,8 @@
 
 head_bearing_height = 0.5625;
 
+head_block_od = 2.625;
+
 /*
  * R24-2RS Radial Bearing: 1.5 ID, 2.625 OD, 0.5625 H
  */
@@ -36,18 +38,24 @@ module head_bearing(){
 head_block_height = 0.75;
 
 /*
- * Turn 3" Round 6061 to (2.625-mechtol) OD
+ * Turn 3" Round 6061 to 2.625 OD
  */
 module head_block(){
 
-	cylinder(r = (2.625-mechtol)/2, h = head_block_height, center = true, $fn = resolution);
+	cylinder(r = head_block_od/2, h = head_block_height, center = true, $fn = resolution);
 }
+
+head_block_mount_gearmotor_clearance = 0.1;
+
 module head_block_mount(){
 	difference(){
 		head_block();
 		gearmotor_mount(head_block_height);
-		translate([0,0,-(head_block_height/2)+0.05]){
-			gearmotor_body(gearmotor_body_radius+0.1, 0.1);
+		translate([0,0,-(head_block_height/2)+(head_block_mount_gearmotor_clearance/2)]){
+			/*
+			 * gearmotor body clearance: maximize mount strength
+			 */
+			gearmotor_body((gearmotor_body_radius+mechtol), head_block_mount_gearmotor_clearance);
 		}
 		translate([0,0,+(head_block_height/2)-0.125]){
 			/*
@@ -71,6 +79,58 @@ module head_block_mount(){
 			 */
 			gearmotor_mount_holes(depth = 0.189, expansion = 0.1771);
 		}
+		head_block_mount_taps();
+	}
+}
+/*
+ * M4 taps with 10 mm depth
+ * Minimal interior wall at gearmotor body clearance (diagonal)
+ */
+module head_block_mount_taps(depth = 0.3937){
+
+	translate([0,0,-0.07]){
+
+		head_block_taps( (head_block_od/2)-(depth/2), depth);
+	}
+}
+/*
+ * ID M4 Tap Hole ID 3.2 mm; IR = 0.126 in
+ */
+module head_block_taps(offset = 0.3937, height = 0.3937){
+
+	for (rot = [45: 90: 360]){
+	
+		translate([(offset*sin(rot)),(offset*cos(rot)),0]){
+			rotate([0,90,rot]){
+				cylinder(r = 0.126, h = height, center = true, $fn = 40);
+				/*
+				 * Minimal wall dimension
+				 * 
+				 * This cube tests the intersection with the gearmotor body clearance (inset 0.1 in)
+				 * 
+				cube(size = height, center = true, $fn = 40);
+				 */
+			}
+		}
+	}
+}
+/*
+ * M4 taps with 8 mm depth
+ * Minimal interior wall at gearmotor body clearance (diagonal)
+ */
+module head_block_shaft_taps(depth = 0.3149){
+
+	head_block_taps( (head_block_od/2)-(depth/2), depth);
+}
+/*
+ * TR-023 Hydraulic Rod T-Seal Buna-N
+ * 1.5" ID x 1.875" OD x 0.28" H
+ */
+module head_block_shaft_tseal(){
+
+	translate([0,0,(head_block_height-0.28+mechtol)/2]){
+
+		cylinder(r = 0.9375, h = 0.28, center = true, $fn = resolution);
 	}
 }
 module head_block_shaft(){
@@ -78,50 +138,58 @@ module head_block_shaft(){
 	difference(){
 		head_block();
 		cylinder(r = (1.5+mechtol)/2, h = head_block_height, center = true, $fn = resolution);
+		head_block_shaft_taps();
+		head_block_shaft_tseal();
 	}
 }
 
 /*
- * Tube 6061 3.0 OD, 2.625 ID
+ * Tube 6061 3.0 OD, 2.625 ID, Wall 0.1875 in
  */
-module head_tube(){
-	difference(){
-		cylinder(r = (3.0/2), h = 8.0, center = true, $fn = resolution);
-		cylinder(r = (2.625/2), h = 8.0, center = true, $fn = resolution);
+module head_tube(height = 8.29){
+	translate([0,0,-((head_block_height)+(head_bearing_spacer_height/2)+(head_bearing_height)+(2*mechtol))]){
+		difference(){
+			cylinder(r = (3.0/2), h = height, center = true, $fn = resolution);
+			cylinder(r = (2.625/2), h = height, center = true, $fn = resolution);
+		}
 	}
 }
 
 head_bearing_spacer_height = 1.5;
 
 /*
- * Tube 6061 2.75 OD, 0.25 Wall turned to (2.625-mechtol) OD
+ * Tube 6061 2.75 OD, 0.25 Wall turned to Head Block OD 2.625 in
  */
 module head_bearing_spacer(){
 	difference(){
-		cylinder(r = (2.625-mechtol)/2, h = head_bearing_spacer_height, center = true, $fn = resolution);
+		cylinder(r = head_block_od/2, h = head_bearing_spacer_height, center = true, $fn = resolution);
 		cylinder(r = (2.25/2), h = head_bearing_spacer_height, center = true, $fn = resolution);
 	}
 }
 /*
- *
+ * Blocks, Bearings, and Spacer
  */
+module head_internal(){
+	translate([0,0,-((gearmotor_body_height/2)+(head_block_height-head_block_mount_gearmotor_clearance)+(head_bearing_spacer_height/2)+(head_bearing_height)+(3*mechtol))]){
+		gearmotor();
+	}
+	translate([0,0,-((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height)+(2*mechtol))]){
+		head_block_mount();
+	}
+	translate([0,0,-((head_bearing_spacer_height/2)+(head_bearing_height/2)+mechtol)]){
+		head_bearing();
+	}
+	translate([0,0,0]){
+		head_bearing_spacer();
+	}
+	translate([0,0,+((head_bearing_spacer_height/2)+(head_bearing_height/2)+mechtol)]){
+		head_bearing();
+	}
+	translate([0,0,+((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height)+(2*mechtol))]){
+		head_block_shaft();
+	}
+}
 module head(){
-	rotate([0,90,0]){
-		% head_tube();
-		translate([0,0,-((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height/2)+(2*mechtol))]){
-			head_block_mount();
-		}
-		translate([0,0,-((head_bearing_spacer_height/2)+(head_bearing_height/2)+mechtol)]){
-			head_bearing();
-		}
-		translate([0,0,0]){
-			head_bearing_spacer();
-		}
-		translate([0,0,+((head_bearing_spacer_height/2)+(head_bearing_height/2)+mechtol)]){
-			head_bearing();
-		}
-		translate([0,0,+((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height/2)+(2*mechtol))]){
-			head_block_shaft();
-		}
-   }
+	head_tube();
+	head_internal();
 }

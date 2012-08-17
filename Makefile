@@ -1,5 +1,5 @@
 
-TARGETS = head_block_mount.stl
+TARGETS = head_block_mount.stl head_block_shaft.stl
 
 all: $(TARGETS)
 

@@ -27,7 +27,7 @@
  */
 
 gearmotor_body_radius = 0.8366;
-gearmotor_mount_height = 3.819;
+gearmotor_body_height = 3.819;
 
 /*
  * Brushless motor with planetary gearhead, 
