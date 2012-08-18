@@ -30,6 +30,10 @@ head_block_gearmotor_clearance = 0.1;
 
 head_bearing_spacer_height = 1.5;
 
+head_tube_od = 3.0;
+
+head_tube_id = 2.625;
+
 head_tube_height = (7.87+head_block_height-head_block_gearmotor_clearance);
 
 head_tube_offset = -((head_tube_height/2)-((head_block_height)+(head_bearing_spacer_height/2)+(head_bearing_height)+(2*mechtol)));
@@ -107,14 +111,14 @@ module head_block_mount(){
 			 * Flat Washer
 			 * Diameter 9mm, 0.3543 in; Height = 0.8 mm, 0.0315 in
 			 */
-			gearmotor_mount_holes(depth = 0.25, expansion = 0.1771);
+			fastener_m4_mount_tapped(depth = 0.25, expansion = 0.1771);
 		}
 		translate([0,0,+(head_block_height/2)-0.25-(0.189/2)]){
 			/*
 			 * Mount bolt head sink 
 			 * M4 ALLEN DIN 912 Head + Flat Washer (4 + 0.8 mm)
 			 */
-			gearmotor_mount_holes(depth = 0.189, expansion = 0.1771);
+			fastener_m4_mount_tapped(depth = 0.189, expansion = 0.1771);
 		}
 		head_block_mount_taps();
 	}
@@ -127,34 +131,14 @@ module head_block_mount_taps(depth = 0.3937){
 
 	translate([0,0,-0.07]){
 
-		head_block_taps( (head_block_od/2)-(depth/2), depth);
+		fastener_m4_round_taps( head_block_od, depth);
 	}
 }
 module head_block_mount_countersinks(){
+
 	translate([0,0,-0.07]){
 
-		tube_countersinks();
-	}
-}
-/*
- * ID M4 Tap Hole ID 3.2 mm; IR = 0.126 in
- */
-module head_block_taps(offset = 0.3937, height = 0.3937){
-
-	for (rot = [45: 90: 360]){
-	
-		translate([(offset*sin(rot)),(offset*cos(rot)),0]){
-			rotate([0,90,rot]){
-				cylinder(r = 0.126, h = height, center = true, $fn = 40);
-				/*
-				 * Minimal wall dimension
-				 * 
-				 * This cube tests the intersection with the gearmotor body clearance (inset 0.1 in)
-				 * 
-				cube(size = height, center = true, $fn = 40);
-				 */
-			}
-		}
+		fastener_m4_tube_countersinks( head_tube_od);
 	}
 }
 /*
@@ -163,42 +147,11 @@ module head_block_taps(offset = 0.3937, height = 0.3937){
  */
 module head_block_shaft_taps(depth = 0.3149){
 
-	head_block_taps( (head_block_od/2)-(depth/2), depth);
+	fastener_m4_round_taps( head_block_od, depth);
 }
-/*
- * M4 counter sunk head
- */
-module m4_countersink(){
-	translate([0,0,0.00385]){
-		union(){
-			translate([0,0,+(0.0899/2)]){
-				cylinder( r = (0.3508/2), h = 0.0899, center = true, $fn = resolution);
-			}
-			translate([0,0,-(0.0976/2)]){
-				cylinder( r1 = (0.1575/2), r2 = (0.3508/2), h = 0.0976, center = true, $fn = resolution);
-			}
-		}
-	}
-}
-module tube_countersinks(radius = ((3.0/2)-0.09375)){
-	__tube_countersinks_F(radius,45);
-	__tube_countersinks_R(radius,135);
-	__tube_countersinks_F(radius,225);
-	__tube_countersinks_R(radius,315);
-}
-module __tube_countersinks_F(radius, rot){
-	translate([(radius*sin(rot)),(radius*cos(rot)),0]){
-		rotate([0,90,rot]){
-			m4_countersink();
-		}
-	}
-}
-module __tube_countersinks_R(radius, rot){
-	translate([(radius*sin(rot)),(radius*cos(rot)),0]){
-		rotate([0,-90,rot]){
-			m4_countersink();
-		}
-	}
+module head_block_shaft_countersinks(){
+
+    fastener_m4_tube_countersinks( head_tube_od);
 }
 /*
  * TR-023 Hydraulic Rod T-Seal Buna-N
@@ -228,8 +181,8 @@ module head_tube(){
 
 		translate([0,0,head_tube_offset]){
 			difference(){
-				cylinder(r = (3.0/2), h = head_tube_height, center = true, $fn = resolution);
-				cylinder(r = (2.625/2), h = head_tube_height, center = true, $fn = resolution);
+				cylinder(r = (head_tube_od/2), h = head_tube_height, center = true, $fn = resolution);
+				cylinder(r = (head_tube_id/2), h = head_tube_height, center = true, $fn = resolution);
 			}
 		}
 
@@ -245,7 +198,7 @@ module head_tube_countersinks(){
 		head_block_mount_countersinks();
 	}
 	translate([0,0,head_block_shaft_offset]){
-		head_block_mount_countersinks();
+		head_block_shaft_countersinks();
 	}
 }
 /*
@@ -294,6 +247,6 @@ module head_internal(){
 }
 module head(){
 	head_internal();
-    head_motor();
+    % head_motor();
 	head_tube();
 }

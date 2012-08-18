@@ -1,3 +1,21 @@
+#!/bin/bash
+
+function usage {
+    cat<<EOF>&2
+Usage
+    $0 name
+
+Description
+    Generate file 'name.scad' for module 'name'.
+
+EOF
+    exit 1
+}
+
+if [ "${1}" ]&&[ -z "$(echo ${1} | grep -e '-')" ]&&[ -z "$(echo ${1} | grep -e 'scad')" ]
+then
+    name=${1}
+    cat<<EOF> ${name}.scad
 /*
  * Antenna Rotator 16 kg-m
  * Copyright 2012 John Pritchard
@@ -28,5 +46,10 @@ include <head.scad>;
 include <mast.scad>;
 
 
-head_block_mount();
+${name}();
 
+EOF
+    ls -l ${name}.scad
+else
+    usage
+fi

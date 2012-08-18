@@ -57,7 +57,7 @@ module gearmotor(){
 				cube(size = [0.7874,0.2166,0.2362], center = true);
 			}
 		}
-		gearmotor_mount_holes(0.5,1.9095);
+		fastener_m4_mount_tapped(0.5,1.9095);
 	}
 }
 /*
@@ -91,21 +91,9 @@ module gearmotor_mount_shoulder(height = gearmotor_mount_shoulder_height, offset
 	}
 }
 /*
- * M4 mounting holes
+ * Motor mounting in the mount plane: shoulder and tap holes
  */
-module gearmotor_mount_holes(depth = 0.5, offset = 0, expansion = 0){
-
-	for (theta = [0 : 90: 300] ){
-		/*
-		 * translate to the mount plane and hole center
-		 * for a representative space.
-		 */
-		translate([0.6693*sin(theta),0.6693*cos(theta),offset]){
-			cylinder(r = 0.0787+expansion, depth, center = true, $fn = resolution);
-		}
-	}
-}
 module gearmotor_mount(depth,offset = 0){
 	gearmotor_mount_shoulder(depth,offset);
-	gearmotor_mount_holes(depth,offset);
+	fastener_m4_mount_tapped(depth,offset);
 }
