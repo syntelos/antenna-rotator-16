@@ -46,13 +46,39 @@ head_bearing_offset = ((head_bearing_spacer_height/2)+(head_bearing_height/2)+me
 
 head_block_shaft_offset = ((head_block_height/2)+(head_bearing_spacer_height/2)+(head_bearing_height)+(2*mechtol));
 
+head_gearmotor_offset = ((gearmotor_body_height/2)+(head_block_height-head_block_gearmotor_clearance)+(head_bearing_spacer_height/2)+(head_bearing_height)+(3*mechtol));
+
+head_vertical_axle_od = 1.5;
+
+head_vertical_axle_height = 10.0;
+
+head_vertical_axle_offset = (head_vertical_axle_height/2)-head_gearmotor_offset+(gearmotor_body_height/2)+gearmotor_mount_shoulder_height+(mechtol*2);
+
+head_vertical_axle_shoulder_offset = -(head_vertical_axle_height/2)+(head_block_height/2);
+
+head_vertical_axle_shoulder_od = (gearmotor_mount_shoulder_radius-(mechtol*2));
+
+head_vertical_axle_antenna_mount_offset = 1.0;
+
+head_vertical_axle_alignment_mount_offset_y = 1.0;
+
+head_vertical_axle_alignment_mount_offset_z = 4.0;
+
+head_vertical_axle_antenna_mount_fastener_offset = (13/16);
+
 echo("head tube height",head_tube_height);
 echo("head tube offset",head_tube_offset);
 echo("head block support offset",head_block_support_offset);
 echo("head block mount offset",head_block_mount_offset);
 echo("head bearing offset",head_bearing_offset);
 echo("head block shaft offset",head_block_shaft_offset);
-
+echo("head gearmotor offset",head_gearmotor_offset);
+echo("head vertical axle offset",head_vertical_axle_offset);
+echo("head vertical axle shoulder offset",head_vertical_axle_shoulder_offset);
+echo("head vertical axle shoulder od",head_vertical_axle_shoulder_od);
+echo("head vertical axle antenna mount offset",head_vertical_axle_antenna_mount_offset);
+echo("head vertical axle alignment mount offset y",head_vertical_axle_alignment_mount_offset_y);
+echo("head vertical axle alignment mount offset z",head_vertical_axle_alignment_mount_offset_z);
 /*
  * R24-2RS Radial Bearing: 1.5 ID, 2.625 OD, 0.5625 H
  */
@@ -214,11 +240,9 @@ module head_bearing_spacer(){
  * gearmotor in head -- vertical rotator
  */
 module head_motor(){
-	assign(offset = -((gearmotor_body_height/2)+(head_block_height-head_block_gearmotor_clearance)+(head_bearing_spacer_height/2)+(head_bearing_height)+(3*mechtol))){
-		echo("gearmotor offset",offset);
-		translate([0,0,offset]){
-			gearmotor();
-		}
+
+	translate([0,0,-(head_gearmotor_offset)]){
+		gearmotor();
 	}
 }
 /*
@@ -245,8 +269,83 @@ module head_internal(){
 		head_block_shaft();
 	}
 }
+/*
+ * Negative applied by difference
+ */
+module head_vertical_axle_shoulder(){
+	translate([0,0,head_vertical_axle_shoulder_offset]){
+		difference(){
+			cylinder( r = (head_vertical_axle_od/2)+mechtol, h = head_block_height, center = true, $fn = resolution);
+			cylinder( r = head_vertical_axle_shoulder_od, h = head_block_height, center = true, $fn = resolution);
+		}
+	}
+}
+/*
+ * The 3/4" square antenna arm and counterbalance insert into 
+ * a 1" square tube that is fixed to the axle
+ */
+module head_vertical_axle_alignment_mount_negative(){
+	translate([0,head_vertical_axle_alignment_mount_offset_y,head_vertical_axle_alignment_mount_offset_z]){
+		union(){
+			cube( size = [2.0,2.0,1.0], center = true);
+			/*
+			 * 1/4-20 female (like tripod attachment)
+			 */
+			rotate([90,0,0]){
+				cylinder( r = 0.125, h = 4.0, center = true, $fn = resolution);
+			}
+		}
+	}
+}
+/*
+ * The 3/4" square antenna arm and counterbalance insert into 
+ * a 1" square tube that is fixed to the axle
+ */
+module head_vertical_axle_antenna_mount_negative(){
+	translate([0,0,head_vertical_axle_antenna_mount_offset]){
+		cube( size = [8.0,1.0,1.0], center = true);
+	}
+}
+module head_vertical_axle_antenna_mount(){
+	translate([0,0,head_vertical_axle_antenna_mount_offset]){
+		difference(){
+			cube( size = [8.0,1.0,1.0], center = true);
+			cube( size = [8.0,0.75,0.75], center = true);
+			translate([-head_vertical_axle_antenna_mount_fastener_offset,0,0]){
+				/*
+				 * 1/4-20 female (like tripod attachment)
+				 */
+				rotate([90,0,0]){
+					cylinder( r = 0.125, h = 4.0, center = true, $fn = resolution);
+				}
+			}
+			translate([head_vertical_axle_antenna_mount_fastener_offset,0,0]){
+				/*
+				 * 1/4-20 female (like tripod attachment)
+				 */
+				rotate([90,0,0]){
+					cylinder( r = 0.125, h = 4.0, center = true, $fn = resolution);
+				}
+			}
+		}
+	}
+}
+module head_vertical_axle(){
+	translate([0,0,head_vertical_axle_offset]){
+		union(){
+			difference(){
+				cylinder( r = (head_vertical_axle_od/2), h = head_vertical_axle_height, center = true, $fn = resolution);
+				head_vertical_axle_shoulder();
+	            head_vertical_axle_antenna_mount_negative();
+				head_vertical_axle_alignment_mount_negative();
+			}
+			head_vertical_axle_antenna_mount();
+		}
+	}
+}
 module head(){
 	head_internal();
     % head_motor();
 	head_tube();
+	head_vertical_axle();
 }

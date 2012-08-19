@@ -29,6 +29,9 @@
 gearmotor_body_radius = 0.8366;
 gearmotor_body_height = 3.819;
 
+gearmotor_mount_shoulder_radius = 0.4724;
+gearmotor_mount_shoulder_height = 0.106;
+
 /*
  * Brushless motor with planetary gearhead, 
  * drive control, position encoder, brake:
@@ -76,10 +79,6 @@ module gearmotor_output_shaft(length = 0.787){
 		cylinder(r = 0.2362, length, center = true, $fn = resolution);
 	}
 }
-
-gearmotor_mount_shoulder_radius = 0.4724;
-gearmotor_mount_shoulder_height = 0.106;
-
 /*
  * Mount shoulder
  * Translated for half of height, centered
